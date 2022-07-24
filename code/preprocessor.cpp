@@ -8,6 +8,7 @@ void readfile(std::fstream& file)
     std::string line, word;
     std::istringstream iss;
 
+
     while(!file.eof())
     {
         getline(file, line);
@@ -15,10 +16,17 @@ void readfile(std::fstream& file)
         removeComment(line);
         std::istringstream iss(line);
         std::cout << line << std::endl;
-        // while (iss >> word)
-        // {
-        //     std::cout<< '|' <<word.c_str()<< '|' <<std::endl;
-        // }
+        while (iss >> word)
+        {
+            if (word.find(':'))
+            {
+                //adiciona no label da struct
+            } //else deixa null
+            //se as palavras acabam, pega proxima linha e junta na com a anterior (resolve rotulo \n)
+            //procurar equ e if
+            
+        }
+        
         
     }
 }
@@ -34,16 +42,6 @@ int main(int argc, char* argv[])
 void str_toupper(std::string& s)
 {
     std::transform(s.begin(),s.end(),s.begin(),[](unsigned char c){ return std::toupper(c);});
-}
-
-std::string removeFormat(std::string inputstr)
-{
-    size_t comentpos;
-    std::regex str_expr("\\s+");
-    std::string result = std::regex_replace(inputstr,str_expr," ");
-    std::regex str_expr1("^[\\s]+|[\\s]+$|;.*");
-    result = std::regex_replace(result,str_expr1,"");
-    return result;
 }
 
 void removeComment (std::string& line)
