@@ -19,6 +19,7 @@ void readfile(std::fstream& file)
     }
     removeEmptylines(vec);
     resolveEQU(vec);
+    resolveIF(vec);
     printVec(vec);
 }
 
@@ -175,4 +176,26 @@ void resolveEQU (std::vector<TokensVector>& vec )
         }       
     }
     removeEmptylines(vec); //remove lines with EQU
+}
+
+void resolveIF (std::vector<TokensVector>& vec )
+{
+    for (int i = 0; i < vec.size(); i++)
+    {
+        if (!vec[i].tokens.empty())
+        {
+            if (vec[i].tokens[0] == "IF")
+            {
+                
+                vec[i].label = "";
+                vec[i].tokens.clear();
+                if (vec[i].tokens[1] == "0")
+                {
+                    vec[i+1].label = "";
+                    vec[i+1].tokens.clear();
+                }
+            }            
+        }    
+    }
+    removeEmptylines(vec);
 }

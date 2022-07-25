@@ -28,3 +28,4 @@ void parseTokens (std::string&, std::vector<TokensVector>&);
 void printVec (std::vector<TokensVector>&);
 void removeEmptylines (std::vector<TokensVector>&);
 void resolveEQU (std::vector<TokensVector>&);
+void resolveIF (std::vector<TokensVector>&);
