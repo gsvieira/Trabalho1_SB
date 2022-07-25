@@ -18,6 +18,7 @@ void readfile(std::fstream& file)
         
     }
     removeEmptylines(vec);
+    resolveEQU(vec);
     printVec(vec);
 }
 
@@ -142,4 +143,36 @@ void removeEmptylines (std::vector<TokensVector>& vec)
         
     }
     
+}
+
+void resolveEQU (std::vector<TokensVector>& vec )
+{
+    std::vector<TabelaEQU> equ;
+    std::string value, label;
+
+    
+    for (auto &&line:vec)
+    {
+        if (line.tokens[0] == "EQU")
+        {
+            label = line.label.substr(0,line.label.find(":"));
+            value = line.tokens[1];
+            equ.push_back({label, value});
+            line.label = "";
+            line.tokens.clear();
+        }
+        else if (line.tokens[0] == "IF" || line.tokens[0] == "CONST")
+        {
+            for (auto &&lt : equ)
+            {
+                if (line.tokens[1] == lt.label)
+                {
+                    line.tokens[1] = lt.value;
+                }
+                
+            }
+                
+        }       
+    }
+    removeEmptylines(vec); //remove lines with EQU
 }
