@@ -19,3 +19,4 @@ std::string removeFormat(std::string);
 void removeComment (std::string&);
 void parseTokens (std::string&, std::vector<TokensVector>&);
 void printVec (std::vector<TokensVector>&);
+void removeEmptylines (std::vector<TokensVector>&);

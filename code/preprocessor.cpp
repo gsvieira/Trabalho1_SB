@@ -2,24 +2,23 @@
 
 
 
-
 void readfile(std::fstream& file)
 {
     std::string line;
     int linecount;
+    std::vector<TokensVector> vec;
 
     while(!file.eof())
     {
-        std::vector<TokensVector> vec;
         getline(file, line);
         str_toupper(line);
         removeComment(line);        
-        std::cout << line << std::endl;
         parseTokens(line, vec);
-        
-        
+        //std::cout << line << std::endl;
         
     }
+    removeEmptylines(vec);
+    printVec(vec);
 }
 
 
@@ -49,70 +48,98 @@ void parseTokens (std::string& line, std::vector<TokensVector>& vec)
 {
     std::string word;
     std::istringstream iss(line);
-    int vecPos = 0;
     size_t pos;
     int test;
-    if (vec.size() <= vecPos)
+
+    vec.emplace_back();
+    
+    //std::cout << "emplaced, size: " << vec.size() << std::endl;
+    
+    
+    while (iss >> word)
+    {
+        pos = word.find(':');
+        //std::cout << pos << std::endl;
+        if (pos != std::string::npos)
         {
-            vec.emplace_back();
-            std::cout << "emplaced, size: " << vec.size() << std::endl;
-        }
-        
-        while (iss >> word)
-        {
-            //std::cout << "reading line" << std::endl;
-            std::cout << test++ << std::endl;
-            pos = word.find(':');
-            std::cout << pos << std::endl;
-            if (pos != std::string::npos)
+            //std::cout << "vec size " << vec.size() << std::endl;
+            if (vec.back().label == "")
             {
-                std::cout << "vec size " << vec.size() << std::endl;
-                if (vec[vecPos].label == "")
-                {
-                    //std::cout << "find label" << std::endl;
-                    vec[vecPos].label = word;  //adiciona no label da struct
-                    std::cout << "size of buf: " << iss.rdbuf()->in_avail() << std::endl;
-                    if (iss.rdbuf()->in_avail() == 0)
-                    {
-                        std::cout << "end of line" << std::endl;
-                    }
-                    continue;
-                }
-                // else
+                //std::cout << "find label" << std::endl;
+                vec.back().label = word;  //adiciona no label da struct
+
+                // std::cout << "size of buf: " << iss.rdbuf()->in_avail() << std::endl;
+                // if (iss.rdbuf()->in_avail() == 0)
                 // {
-                //     std::cout << "Erro: Mais de um rotulo na mesma linha" << std::endl;
-                //     std::exit(0);
-                // }           
+                //     std::cout << "end of line" << std::endl;
+                // }
+                
             }
             else
             {
-                //std::cout<< word << std::endl;
-                vec[vecPos].tokens.emplace_back(word);
-            }
-            
-            
-            vecPos++;
+                std::cout << "Erro: Mais de um rotulo na mesma linha" << std::endl;
+                std::exit(0);
+            }           
         }
+        else
+        {
+            //std::cout<< word << std::endl;
+            vec.back().tokens.emplace_back(word);
+        }
+        
+    
+    }
 }
 
 void printVec (std::vector<TokensVector>& vec)
 {
-    for(auto content: vec)
+    for(auto line: vec)
     {
-        if (content.label != "")
+        if (!line.label.empty())
         {
-            std::cout << content.label<< " ";
+            std::cout << line.label<< " ";
         }
-        for (int i = 0; i < sizeof(content.tokens); i++)
+        if (!line.tokens.empty())
         {
-            if (i == sizeof(content.tokens))
+            for (int i = 0; i < line.tokens.size(); i++)
             {
-                std::cout << content.tokens[i] << std::endl;
-            }
-            else
-            {
-            std::cout << content.tokens[i] << " ";
-            }
-        }        
+                if (i==0)
+                {
+                    std::cout << line.tokens[i];
+                }
+                else
+                    std::cout << " " << line.tokens[i]; 
+                
+            }        
+            std::cout << std::endl;
+        }
+        else
+            std::cout << std::endl;
+        
     }
+}
+
+void removeEmptylines (std::vector<TokensVector>& vec)
+{
+    auto it = vec.begin();
+    while (it != vec.end())
+    {
+        //std::cout << "valores: "<< !(*it).label.empty() << std::endl << (*it).tokens.empty() << std::endl;
+
+        if (((*it).label.empty() && (*it).tokens.empty()))
+        {
+            it = vec.erase(it);
+        } else if ((!(*it).label.empty()) && ((*it).tokens.empty()))
+        {
+            (*it).tokens.swap((*(it+1)).tokens); //= (*(it+1)).tokens; // vec[i].tokens = vec[i+1].tokens
+            it++;
+        }
+        else
+        {
+            it++;
+        }
+        
+        
+    }
+    
 }
