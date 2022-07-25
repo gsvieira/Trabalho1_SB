@@ -17,3 +17,5 @@ void str_toupper(std::string&);
 void readfile(std::fstream&);
 std::string removeFormat(std::string);
 void removeComment (std::string&);
+void parseTokens (std::string&, std::vector<TokensVector>&);
+void printVec (std::vector<TokensVector>&);
