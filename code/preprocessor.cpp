@@ -7,10 +7,13 @@ void readfile(std::fstream& file)
 {
     std::string line, word;
     std::istringstream iss;
-
+    size_t pos;
+    int linecount;
 
     while(!file.eof())
     {
+        std::vector<struct TokensVector> vec;
+        int vecPos = 0;
         getline(file, line);
         str_toupper(line);
         removeComment(line);
@@ -18,11 +21,20 @@ void readfile(std::fstream& file)
         std::cout << line << std::endl;
         while (iss >> word)
         {
-            if (word.find(':'))
+            pos = word.find(':');
+            if (pos != std::string::npos)
             {
-                //adiciona no label da struct
-            } //else deixa null
+                if (vec[vecPos].label == "")
+                {
+                    vec[vecPos].label = word;  //adiciona no label da struct
+                }
+                else
+                {
+                    std::cout << "Erro: Mais de um rotulo na mesma linha" << std::endl;
+                }                                
             //se as palavras acabam, pega proxima linha e junta na com a anterior (resolve rotulo \n)
+            
+            }
             //procurar equ e if
             
         }

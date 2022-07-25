@@ -5,12 +5,12 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include<algorithm>
-#include<regex>
+#include <algorithm>
+#include <regex>
 
-struct arrayOfTokens
+struct TokensVector
 {
-    std::string Label;
+    std::string label;
     std::vector<std::string> tokens;
 };
 void str_toupper(std::string&);
