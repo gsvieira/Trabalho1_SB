@@ -1,3 +1,4 @@
+#include "preprocessor.h"
 #include <iostream>
 #include <fstream>
 
@@ -12,12 +13,12 @@ int main(int argc, char* argv[])
 
     if (file.is_open())
     {
-        if (argv[1] == "-p")
+        if (argv[1] == std::string("-p"))
         {
-            //preprocess
+            readfile(file, argv[3]);
         }
         
-        if (argv[1] == "-o")
+        if (argv[1] == std::string("-o"))
         {
             //process
         }

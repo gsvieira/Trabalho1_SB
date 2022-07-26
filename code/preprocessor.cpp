@@ -24,14 +24,6 @@ void readfile(std::fstream& file, std::string ofile)
     preprocessor2file(vec, ofile);
 }
 
-
-
-int main(int argc, char* argv[])
-{
-    std::fstream file(argv[2]);
-    readfile(file, argv[3]);
-}
-
 void str_toupper(std::string& s)
 {
     std::transform(s.begin(),s.end(),s.begin(),[](unsigned char c){ return std::toupper(c);});
