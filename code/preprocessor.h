@@ -6,7 +6,6 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
-#include <regex>
 
 struct TokensVector
 {

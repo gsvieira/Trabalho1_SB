@@ -22,9 +22,10 @@ int main(int argc, char* argv[])
         {
             //process
         }
-    } else {
+    } 
+    else 
+    {
         std::cout << "Não foi possivel abrir o arquivo" << std::endl;
-
     }
     
 }
