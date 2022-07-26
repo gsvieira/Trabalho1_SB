@@ -122,25 +122,28 @@ void preprocessor2file(std::vector<TokensVector>& vec, std::string filename)
 {
     std::fstream file(filename,std::ios_base::out);
 
-    for(auto line: vec)
+    for(int j = 0; j < vec.size(); j++)
     {
-        if (!line.label.empty())
+        if (!vec[j].label.empty())
         {
-            file << line.label << " ";
+            file << vec[j].label << " ";
         }
-        if (!line.tokens.empty())
+        if (!vec[j].tokens.empty())
         {
-            for (int i = 0; i < line.tokens.size(); i++)
+            for (int i = 0; i < vec[j].tokens.size(); i++)
             {
                 if (i==0)
                 {
-                    file << line.tokens[i];
+                    file << vec[j].tokens[i];
                 }
                 else
-                    file << " " << line.tokens[i]; 
+                    file << " " << vec[j].tokens[i]; 
                 
-            }        
-            file << std::endl;
+            }
+            if(j != vec.size()-1)
+            {
+                file << std::endl;
+            }
         }
         else
             file << std::endl;
