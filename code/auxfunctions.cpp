@@ -24,8 +24,7 @@ void printVec (std::vector<TokensVector>& vec)
         }
         else
             std::cout << std::endl;
-        
-    }
+        }
 }
 
 void parseTokens (std::string& line, std::vector<TokensVector>& vec)

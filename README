@@ -9,8 +9,8 @@ instruções de compilação:
 
 g++ *.cpp -o montador
 
-intruções de uso: ./montador -p myprogram.asm saida.obj
+intruções de uso: "./montador -p myprogram.asm saida.obj"
 
-./ligador myprog1.obj myprog2.obj prog
+"./ligador myprog1.obj myprog2.obj prog"
 
 
