@@ -6,3 +6,6 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
+#include "auxfunctions.h"
+
+//void process(char**);
