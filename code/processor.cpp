@@ -17,6 +17,7 @@ void process(std::fstream &file, std::string ofile)
 	}
 	linecounter = 1;
 	locationcounter = 0;
+	
 	//printTS(ts);
 	secondpass(vec, outvec, ti, ts, linecounter, locationcounter);
 	processtofile(outvec, ofile);

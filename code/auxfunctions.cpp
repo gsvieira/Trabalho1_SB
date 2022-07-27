@@ -68,6 +68,7 @@ void parseTokens(std::string &line, std::vector<TokensVector> &vec, int &linecou
 
     while (iss >> word)
     {
+        valToken(word, linecounter);
         pos = word.find(':');
         if (pos != std::string::npos)
         {
@@ -77,7 +78,7 @@ void parseTokens(std::string &line, std::vector<TokensVector> &vec, int &linecou
             }
             else
             {
-                std::cout << "Erro: Sintático - Mais de um rotulo na mesma linha - Linha: "<< linecounter << std::endl;
+                std::cout << "Erro: Sintático - Mais de um rotulo na mesma linha - Linha: " << linecounter << std::endl;
                 std::exit(0);
             }
         }
@@ -87,4 +88,31 @@ void parseTokens(std::string &line, std::vector<TokensVector> &vec, int &linecou
         }
     }
     linecounter++;
+}
+
+void valToken(std::string token, int &linecounter)
+{
+    if (token.size() > 99 || !isvalidtype(token))
+    {
+        std::cout << "Erro: Léxico - Token Inválido - Linha: " << linecounter << std::endl;
+    }
+}
+
+bool isvalidtype(std::string token)
+{
+    if (iswalpha(token[0]) || token[0] == '_')
+    {
+        for (int i = 1; i < token.size(); i++)
+        {
+            if (!iswalnum(token[i]) || !token[0] == '_')
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
