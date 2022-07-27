@@ -35,6 +35,19 @@ struct SymbolTable
     }
 };
 
+struct DefTable
+{
+    std::string label;
+    std::string value;
+
+    DefTable(std::string l)
+    {
+        label = l;
+        value = "";
+    }
+};
+
+//Variaveis globais
 const std::vector<InstructionsTable> ti = {{"ADD", "1", 2},
                                            {"SUB", "2", 2},
                                            {"MUL", "3", 2},
@@ -50,6 +63,8 @@ const std::vector<InstructionsTable> ti = {{"ADD", "1", 2},
                                            {"OUTPUT", "13", 2},
                                            {"STOP", "14", 1}};
 
+
+
 void process(std::fstream&, std::string);
 void firstpass(std::vector<TokensVector> &, const std::vector<InstructionsTable> &, std::vector<SymbolTable> &, int &, int &);
 void secondpass(std::vector<TokensVector> &, std::vector<std::string> &, const std::vector<InstructionsTable> &, std::vector<SymbolTable> &, int &, int &);
@@ -59,3 +74,4 @@ void printvec(std::vector<std::string> &outvec);
 void processtofile(std::vector<std::string>&, std::string);
 void verifySections(const std::vector<TokensVector>& vec);
 bool isdirective(std::string);
+void copyTStoTD(std::vector<SymbolTable> &);

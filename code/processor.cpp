@@ -1,5 +1,8 @@
 #include "processor.h"
 
+std::vector<TokensVector> tu;
+std::vector<DefTable> td;
+bool load = false;
 void process(std::fstream &file, std::string ofile)
 {
 	std::string line;
@@ -15,6 +18,7 @@ void process(std::fstream &file, std::string ofile)
 		parseTokens(line, vec);
 		firstpass(vec, ti, ts, linecounter, locationcounter);
 	}
+	copyTStoTD(ts);
 	linecounter = 1;
 	locationcounter = 0;
 	
@@ -40,12 +44,26 @@ void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTab
 					exit(0);
 				}
 			}
-
-			ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter); // acrescenta após não encontrar o valor na tabela
+			if (vec.back().tokens[0] == "EXTERN")
+			{
+				ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter, true); // acrescenta com flag extern caso seja uma variável externa
+			}
+			else
+			{
+				ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter); // acrescenta após não encontrar o valor na tabela
+			}
+			
 		}
 		else // adiciona simbolo na tabela de simbolos
 		{
-			ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter); // acrescenta se tabela estiver vazia
+			if (vec.back().tokens[0] == "EXTERN")
+			{
+				ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter, true); // acrescenta com flag extern caso seja uma variável externa
+			}
+			else
+			{
+				ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter); // acrescenta se a tabela for vazia
+			}
 		}
 	}
 
@@ -61,6 +79,15 @@ void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTab
 	{
 		locationcounter++; // acrescenta 1 no endereço no caso das diretivas SPACE e CONST
 	}
+	if (vec.back().tokens[0] == "PUBLIC")
+	{
+		td.emplace_back(vec.back().tokens[1]);
+	}
+	if (vec.back().tokens[0]== "BEGIN")
+	{
+		load == true;
+	}
+	
 	linecounter++;
 }
 
@@ -282,4 +309,18 @@ bool isdirective(std::string token)
 		return true;
 	}
 	return false;
+}
+
+void copyTStoTD(std::vector<SymbolTable> &ts)
+{
+	for (auto &&linetd : td)
+	{
+		int tdvalue = searchTS(linetd.label,ts);
+		if (tdvalue != -1)
+		{
+			linetd.value = tdvalue;
+		}
+		
+	}
+	
 }
