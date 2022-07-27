@@ -19,6 +19,7 @@ void process(std::fstream &file, std::string ofile)
 	locationcounter = 0;
 	
 	//printTS(ts);
+	//printVec(vec);
 	secondpass(vec, outvec, ti, ts, linecounter, locationcounter);
 	processtofile(outvec, ofile);
 }
@@ -27,14 +28,14 @@ void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTab
 {
 	if (!vec.back().label.empty()) // se tem rotulo procura na tabela de simbolos
 	{
+		valToken(vec.back().label.substr(0,vec.back().label.find(":")),linecounter);
 		if (!ts.empty()) // se a tabela tem membros faz a busca
 		{
 			for (int i = 0; i < ts.size(); i++)
 			{
-				if (vec.back().label == ts[i].token)
+				if (vec.back().label.substr(0,vec.back().label.find(":")) == ts[i].token)
 				{
-					std::cout << "Erro: Semantico - Símbolo Redefinido" << std::endl
-							  << "Linha: " << linecounter << std::endl;
+					std::cout << "Erro: Semantico - Símbolo Redefinido: " << vec.back().label << " - Linha: " << linecounter << std::endl;
 					exit(0);
 				}
 			}
@@ -74,21 +75,29 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 {
 	for (auto &&line : vec)
 	{
-		if (line.tokens.size() >= 2 && line.tokens[0] != "CONST")
+		if (line.tokens.size() == 2 && line.tokens[0] != "CONST") 
 		{
+			//std::cout << line.tokens[1] << std::endl;
+			valToken(line.tokens[1], linecounter);
 			if (searchTS(line.tokens[1], ts) < 0)
 			{
-				std::cout << "Erro: Semantico - Simbolo indefinido - Linha: " << linecounter << std::endl;
+				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[1] << " - Linha: " << linecounter << std::endl;
 				exit(0);
 			}
-
-			if (line.tokens.size() == 3)
+		}
+		else if (line.tokens.size() == 3)
+		{
+			valToken(line.tokens[1].substr(0,line.tokens[1].find(",")), linecounter);
+			if (searchTS(line.tokens[1].substr(0,line.tokens[1].find(",")), ts) < 0)
 			{
-				if (searchTS(line.tokens[1], ts) < 0)
-				{
-					std::cout << "Erro: Semantico - Simbolo indefinido - Linha: " << linecounter << std::endl;
-					exit(0);
-				}
+				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[1] << " - Linha: " << linecounter << std::endl;
+				exit(0);
+			}
+			valToken(line.tokens[2], linecounter);
+			if (searchTS(line.tokens[2], ts) < 0)
+			{
+				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[2] << " - Linha: " << linecounter << std::endl;
+				exit(0);
 			}
 		}
 		// procura na tabela de instruções
@@ -104,15 +113,16 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 				if (line.tokens.size() == inst.size)
 				{
 					outvec.push_back(inst.opcode); // passando opcode para output vector
-					if (line.tokens.size() >= 2)
+					if (line.tokens.size() == 2)
 					{
 						outvec.push_back(std::to_string(searchTS(line.tokens[1], ts))); // passando primeiro operando, caso exista, para output vector
-
-						if (line.tokens.size() == 3)
-						{
-							outvec.push_back(std::to_string(searchTS(line.tokens[2], ts))); // passando segundo operando, caso exista, para output vector
-						}
 					}
+					if (line.tokens.size() == 3)
+					{
+						outvec.push_back(std::to_string(searchTS(line.tokens[1].substr(0,line.tokens[1].find(",")), ts))); // passando primeiro operando, caso exista, para output vector
+						outvec.push_back(std::to_string(searchTS(line.tokens[2], ts))); // passando segundo operando, caso exista, para output vector
+					}
+					linecounter++; // incrementar o contador de linhas
 					break;
 				}
 				else
@@ -132,6 +142,7 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 				if (line.tokens.size() == 2)
 				{
 					outvec.push_back(line.tokens[1]);
+					linecounter++; // incrementar o contador de linhas
 					continue;
 				}
 				else
@@ -147,6 +158,7 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 				if (line.tokens.size() == 1)
 				{
 					outvec.push_back("0");
+					linecounter++; // incrementar o contador de linhas
 					continue;
 				}
 				else
@@ -167,7 +179,7 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 			exit(0);
 		}
 	}
-	linecounter++; // incrementar o contador de linhas
+	
 }
 
 int searchTS(std::string token, std::vector<SymbolTable> ts)

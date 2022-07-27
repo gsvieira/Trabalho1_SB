@@ -68,7 +68,7 @@ void parseTokens(std::string &line, std::vector<TokensVector> &vec, int &linecou
 
     while (iss >> word)
     {
-        valToken(word, linecounter);
+        //valToken(word, linecounter);
         pos = word.find(':');
         if (pos != std::string::npos)
         {
@@ -94,7 +94,8 @@ void valToken(std::string token, int &linecounter)
 {
     if (token.size() > 99 || !isvalidtype(token))
     {
-        std::cout << "Erro: Léxico - Token Inválido - Linha: " << linecounter << std::endl;
+        std::cout << "Erro: Léxico - Token Inválido: " << token << " - Linha: " << linecounter << std::endl;
+        exit(0);
     }
 }
 
