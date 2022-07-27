@@ -6,13 +6,14 @@ void readfile(std::fstream& file, std::string ofile)
 {
     std::string line;
     std::vector<TokensVector> vec;
+    int linecounter = 0;
 
     while(!file.eof())
     {
         getline(file, line);
         str_toupper(line);
         removeComment(line);        
-        parseTokens(line, vec);
+        parseTokens(line, vec, linecounter);
         //std::cout << line << std::endl;
         
     }

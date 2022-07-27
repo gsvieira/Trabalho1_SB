@@ -35,15 +35,15 @@ struct SymbolTable
     }
 };
 
-const std::vector<InstructionsTable> ti = {{"ADD", "01", 2},
-                                           {"SUB", "02", 2},
-                                           {"MUL", "03", 2},
-                                           {"DIV", "04", 2},
-                                           {"JMP", "05", 2},
-                                           {"JMPN", "06", 2},
-                                           {"JMPP", "07", 2},
-                                           {"JMPZ", "08", 2},
-                                           {"COPY", "09", 3},
+const std::vector<InstructionsTable> ti = {{"ADD", "1", 2},
+                                           {"SUB", "2", 2},
+                                           {"MUL", "3", 2},
+                                           {"DIV", "4", 2},
+                                           {"JMP", "5", 2},
+                                           {"JMPN", "6", 2},
+                                           {"JMPP", "7", 2},
+                                           {"JMPZ", "8", 2},
+                                           {"COPY", "9", 3},
                                            {"LOAD", "10", 2},
                                            {"STORE", "11", 2},
                                            {"INPUT", "12", 2},
@@ -55,3 +55,4 @@ void firstpass(std::vector<TokensVector> &, const std::vector<InstructionsTable>
 void secondpass(std::vector<TokensVector> &, std::vector<std::string> &, const std::vector<InstructionsTable> &, std::vector<SymbolTable> &, int &, int &);
 void printTS(std::vector<SymbolTable> &);
 int searchTS(std::string, std::vector<SymbolTable>);
+void printvec(std::vector<std::string> &outvec);

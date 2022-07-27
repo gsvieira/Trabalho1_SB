@@ -23,8 +23,11 @@ void process(char **argv)
 	}
 	linecounter = 1;
 	locationcounter = 0;
-	// printVec(vec);
 	printTS(ts);
+	std::cout << std::endl
+			  << std::endl;
+	secondpass(vec, outvec, ti, ts, linecounter, locationcounter);
+	printvec(outvec);
 }
 
 void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTable> &ti, std::vector<SymbolTable> &ts, int &linecounter, int &locationcounter)
@@ -43,11 +46,11 @@ void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTab
 				}
 			}
 
-			ts.emplace_back(vec.back().label, locationcounter); // acrescenta após não encontrar o valor na tabela
+			ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter); // acrescenta após não encontrar o valor na tabela
 		}
 		else // adiciona simbolo na tabela de simbolos
 		{
-			ts.emplace_back(vec.back().label, locationcounter); // acrescenta se tabela estiver vazia
+			ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter); // acrescenta se tabela estiver vazia
 		}
 	}
 
@@ -78,12 +81,13 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 {
 	for (auto &&line : vec)
 	{
-		if (line.tokens.size() >= 2)
+		if (line.tokens.size() >= 2 && line.tokens[0] != "CONST")
 		{
-
+			std::cout << "token: " << line.tokens[1] << std::endl;
 			if (searchTS(line.tokens[1], ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido - Linha: " << linecounter << std::endl;
+				exit(0);
 			}
 
 			if (line.tokens.size() == 3)
@@ -91,6 +95,7 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 				if (searchTS(line.tokens[1], ts) < 0)
 				{
 					std::cout << "Erro: Semantico - Simbolo indefinido - Linha: " << linecounter << std::endl;
+					exit(0);
 				}
 			}
 		}
@@ -100,6 +105,8 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 		{
 			if (line.tokens[0] == inst.token) // se a instrução da linha for a mesma da linha da tabela de instrução
 			{
+
+				// std::cout << "token: "<< line.tokens[0] << " == "<< inst.token << std::endl;
 				locationcounter += inst.size;
 				find = true;
 				if (line.tokens.size() == inst.size)
@@ -147,7 +154,7 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 			{
 				if (line.tokens.size() == 1)
 				{
-					outvec.push_back("00");
+					outvec.push_back("0");
 					continue;
 				}
 				else
@@ -162,7 +169,11 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 			// EXTERN
 			// PUBLIC
 		}
-		std::cout << "Erro: Semantico - Operação não identificada - Linha: " << linecounter << std::endl;
+		if (find == false)
+		{
+			std::cout << "Erro: Semantico - Operação não identificada - Linha: " << linecounter << std::endl;
+			exit(0);
+		}
 	}
 	linecounter++; // incrementar o contador de linhas
 }
@@ -177,4 +188,13 @@ int searchTS(std::string token, std::vector<SymbolTable> ts)
 		}
 	}
 	return -1;
+}
+
+void printvec(std::vector<std::string> &outvec)
+{
+	for (auto &&line : outvec)
+	{
+		std::cout << line << " ";
+	}
+	std::cout << std::endl;
 }
