@@ -56,3 +56,4 @@ void secondpass(std::vector<TokensVector> &, std::vector<std::string> &, const s
 void printTS(std::vector<SymbolTable> &);
 int searchTS(std::string, std::vector<SymbolTable>);
 void printvec(std::vector<std::string> &outvec);
+void processtofile(std::vector<std::string>&, std::string);

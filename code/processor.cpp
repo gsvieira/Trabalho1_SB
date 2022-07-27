@@ -1,6 +1,6 @@
 #include "processor.h"
 
-void process(std::fstream& file, std::string ofile)
+void process(std::fstream &file, std::string ofile)
 {
 	std::string line;
 	int linecounter = 1;
@@ -17,11 +17,9 @@ void process(std::fstream& file, std::string ofile)
 	}
 	linecounter = 1;
 	locationcounter = 0;
-	printTS(ts);
-	std::cout << std::endl
-			  << std::endl;
+	//printTS(ts);
 	secondpass(vec, outvec, ti, ts, linecounter, locationcounter);
-	printvec(outvec);
+	processtofile(outvec, ofile);
 }
 
 void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTable> &ti, std::vector<SymbolTable> &ts, int &linecounter, int &locationcounter)
@@ -77,7 +75,6 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 	{
 		if (line.tokens.size() >= 2 && line.tokens[0] != "CONST")
 		{
-			std::cout << "token: " << line.tokens[1] << std::endl;
 			if (searchTS(line.tokens[1], ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido - Linha: " << linecounter << std::endl;
@@ -191,4 +188,18 @@ void printvec(std::vector<std::string> &outvec)
 		std::cout << line << " ";
 	}
 	std::cout << std::endl;
+}
+
+void processtofile(std::vector<std::string> &outvec, std::string filename)
+{
+	std::fstream file(filename, std::ios_base::out);
+	for (int i = 0; i < outvec.size(); i++)
+	{
+		if (i == 0)
+		{
+			file << outvec[i];
+		}
+		else
+			file << " " << outvec[i];
+	}
 }
