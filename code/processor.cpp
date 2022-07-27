@@ -20,6 +20,7 @@ void process(std::fstream &file, std::string ofile)
 	
 	//printTS(ts);
 	//printVec(vec);
+	verifySections(vec);
 	secondpass(vec, outvec, ti, ts, linecounter, locationcounter);
 	processtofile(outvec, ofile);
 }
@@ -75,7 +76,7 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 {
 	for (auto &&line : vec)
 	{
-		if (line.tokens.size() == 2 && line.tokens[0] != "CONST") 
+		if (line.tokens.size() == 2 && !isdirective(line.tokens[0])) 
 		{
 			//std::cout << line.tokens[1] << std::endl;
 			valToken(line.tokens[1], linecounter);
@@ -167,7 +168,13 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 					exit(0);
 				}
 			}
-
+			//SECAO
+			if (line.tokens[0] == "SECAO")
+			{
+				linecounter++;
+				continue;
+			}
+			
 			// BEGIN
 			// END
 			// EXTERN
@@ -215,4 +222,64 @@ void processtofile(std::vector<std::string> &outvec, std::string filename)
 		else
 			file << " " << outvec[i];
 	}
+}
+
+void verifySections(const std::vector<TokensVector>& vec)
+{
+	int text = -1;
+	int data = -1;
+	for (int i = 0; i < vec.size(); i++)
+	{
+		if (vec[i].tokens[0] != "SECAO")
+		{
+			if (vec[i].tokens[0] != "SPACE" && vec[i].tokens[0] != "CONST")// se não é diretiva que fica na seção de dados
+			{
+				if (data != -1 && i > data)// intrução está na seção de dados
+				{	
+					std::cout <<" Erro: Semantico - instruções ou diretivas nas seções erradas - Linha: " << i+1 << std::endl;
+					exit(0);
+				}
+				
+			}
+			else
+			{
+				if (data == -1) //data não foi definido no arquivo
+				{
+					std::cout << "Erro: Semantico - instruções ou diretivas nas seções erradas - Linha: " << i+1 << std::endl;
+					exit(0);
+				}
+				
+			}
+			
+			
+		}
+		else if (vec[i].tokens[0] == "SECAO")
+		{
+			if (vec[i].tokens[1] == "TEXTO")
+			{
+				text = i;
+			}
+			else if (vec[i].tokens[1] == "DADOS")
+			{
+				data = i;
+			}
+			
+		}
+		
+		
+	}
+	if (text == -1)
+	{
+		std::cout << "Erro: Semantico - falta de seção de texto" << std::endl;
+	}
+	
+}
+
+bool isdirective(std::string token)
+{
+	if (token == "CONST" || token == "SPACE" || token == "BEGIN" || token == "END" || token == "EXTERN" || token == "PUBLIC" || token == "SECAO")
+	{
+		return true;
+	}
+	return false;
 }

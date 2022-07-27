@@ -57,3 +57,5 @@ void printTS(std::vector<SymbolTable> &);
 int searchTS(std::string, std::vector<SymbolTable>);
 void printvec(std::vector<std::string> &outvec);
 void processtofile(std::vector<std::string>&, std::string);
+void verifySections(const std::vector<TokensVector>& vec);
+bool isdirective(std::string);
