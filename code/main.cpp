@@ -1,4 +1,5 @@
 #include "preprocessor.h"
+#include "processor.h"
 #include <iostream>
 #include <fstream>
 
@@ -20,7 +21,7 @@ int main(int argc, char* argv[])
         
         if (argv[1] == std::string("-o"))
         {
-            //process
+            process(file, argv[3]);
         }
     } 
     else 

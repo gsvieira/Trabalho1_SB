@@ -1,13 +1,7 @@
 #include "processor.h"
 
-int main(int argc, char *argv[])
+void process(std::fstream& file, std::string ofile)
 {
-	process(argv);
-}
-
-void process(char **argv)
-{
-	std::fstream file(argv[2]);
 	std::string line;
 	int linecounter = 1;
 	int locationcounter = 0;

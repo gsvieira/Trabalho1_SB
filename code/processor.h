@@ -50,7 +50,7 @@ const std::vector<InstructionsTable> ti = {{"ADD", "1", 2},
                                            {"OUTPUT", "13", 2},
                                            {"STOP", "14", 1}};
 
-void process(char **);
+void process(std::fstream&, std::string);
 void firstpass(std::vector<TokensVector> &, const std::vector<InstructionsTable> &, std::vector<SymbolTable> &, int &, int &);
 void secondpass(std::vector<TokensVector> &, std::vector<std::string> &, const std::vector<InstructionsTable> &, std::vector<SymbolTable> &, int &, int &);
 void printTS(std::vector<SymbolTable> &);
