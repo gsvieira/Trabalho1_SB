@@ -1,3 +1,6 @@
 /.vscode
 montador
+!/montador
 processor
+*.pre
+*.obj

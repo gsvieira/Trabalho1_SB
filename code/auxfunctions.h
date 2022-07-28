@@ -16,6 +16,4 @@ struct TokensVector
 void parseTokens(std::string &, std::vector<TokensVector> &);
 void parseTokens(std::string &, std::vector<TokensVector> &, int &);
 void printVec(std::vector<TokensVector> &);
-bool isvalidtype(std::string);
-void valToken(std::string, int &);
 void preprocessor2file(std::vector<TokensVector> &, std::fstream &);

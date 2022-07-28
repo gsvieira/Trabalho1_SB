@@ -68,7 +68,6 @@ void parseTokens(std::string &line, std::vector<TokensVector> &vec, int &linecou
 
     while (iss >> word)
     {
-        // valToken(word, linecounter);
         pos = word.find(':');
         if (pos != std::string::npos)
         {
@@ -88,34 +87,6 @@ void parseTokens(std::string &line, std::vector<TokensVector> &vec, int &linecou
         }
     }
     linecounter++;
-}
-
-void valToken(std::string token, int &linecounter)
-{
-    if (token.size() > 99 || !isvalidtype(token))
-    {
-        std::cout << "Erro: Léxico - Token Inválido: " << token << " - Linha: " << linecounter << std::endl;
-        exit(0);
-    }
-}
-
-bool isvalidtype(std::string token)
-{
-    if (iswalpha(token[0]) || token[0] == '_')
-    {
-        for (int i = 1; i < token.size(); i++)
-        {
-            if (!iswalnum(token[i]) || !token[0] == '_')
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    else
-    {
-        return false;
-    }
 }
 
 void preprocessor2file(std::vector<TokensVector> &vec, std::fstream &file)
@@ -140,7 +111,6 @@ void preprocessor2file(std::vector<TokensVector> &vec, std::fstream &file)
             if (j != vec.size() - 1)
             {
                 file << std::endl;
-                
             }
         }
         else

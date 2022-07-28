@@ -27,6 +27,7 @@ void process(std::fstream &file, std::string ofile)
 	// printVec(vec);
 	verifySections(vec);
 	secondpass(vec, outvec, ti, ts, linecounter, locationcounter);
+
 	std::fstream outputfile(ofile, std::ios_base::out);
 	// print to file
 	montador2file(outvec, outputfile);
@@ -49,7 +50,7 @@ void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTab
 			}
 			if (vec.back().tokens[0] == "EXTERN")
 			{
-				ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter, true); // acrescenta com flag extern caso seja uma variável externa
+				ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), 0, true); // acrescenta com flag extern caso seja uma variável externa
 			}
 			else
 			{
@@ -60,7 +61,7 @@ void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTab
 		{
 			if (vec.back().tokens[0] == "EXTERN")
 			{
-				ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter, true); // acrescenta com flag extern caso seja uma variável externa
+				ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), 0, true); // acrescenta com flag extern caso seja uma variável externa
 			}
 			else
 			{
@@ -93,7 +94,7 @@ void printTS(std::vector<SymbolTable> &ts)
 {
 	for (auto &&line : ts)
 	{
-		std::cout << line.token << " " << line.value << std::endl;
+		std::cout << line.token << " " << line.value << " " << line.externSymbol << std::endl;
 	}
 }
 
@@ -103,7 +104,6 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 	{
 		if (line.tokens.size() == 2 && !isdirective(line.tokens[0]))
 		{
-			// std::cout << line.tokens[1] << std::endl;
 			valToken(line.tokens[1], linecounter);
 			addtoTU(line.tokens[1], linecounter, ts);
 			if (searchTS(line.tokens[1], ts) < 0)
@@ -135,8 +135,6 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 		{
 			if (line.tokens[0] == inst.token) // se a instrução da linha for a mesma da linha da tabela de instrução
 			{
-
-				// std::cout << "token: "<< line.tokens[0] << " == "<< inst.token << std::endl;
 				locationcounter += inst.size;
 				find = true;
 				if (line.tokens.size() == inst.size)
@@ -276,7 +274,7 @@ void verifySections(const std::vector<TokensVector> &vec)
 	{
 		if (vec[i].tokens[0] != "SECAO")
 		{
-			if (vec[i].tokens[0] != "SPACE" && vec[i].tokens[0] != "CONST") // se não é diretiva que fica na seção de dados
+			if (vec[i].tokens[0] != "SPACE" && vec[i].tokens[0] != "CONST" && vec[i].tokens[0] != "END") // se não é diretiva que fica na seção de dados
 			{
 				if (data != -1 && i > data) // intrução está na seção de dados
 				{
@@ -327,7 +325,7 @@ void copyTStoTD(std::vector<SymbolTable> &ts)
 		int tdvalue = searchTS(linetd.label, ts);
 		if (tdvalue != -1)
 		{
-			linetd.value = tdvalue;
+			linetd.value = std::to_string(tdvalue);
 		}
 	}
 }
@@ -336,17 +334,34 @@ void addtoTU(std::string token, int &locationcounter, std::vector<SymbolTable> &
 {
 	if (load == true)
 	{
-		int pos = searchTS(token, ts);
-		if (pos != -1)
+		int pos;
+		for (pos = 0; pos < ts.size(); pos++)
+		{
+			if (ts[pos].token == token)
+			{
+				break;
+			}
+		}
+		if (pos != ts.size())
 		{
 			if (ts[pos].externSymbol == true)
 			{
-				for (auto &&linetu : tu)
+				if (tu.empty())
 				{
-					int tuPos = searchTU(token, tu);
-					if (tuPos != -1)
+					tu.emplace_back();
+					tu.back().label = token;
+					tu.back().tokens.emplace_back(std::to_string(locationcounter));
+				}
+				else
+				{
+					for (auto &&linetu : tu)
 					{
-						tu[tuPos].tokens.push_back(std::to_string(locationcounter));
+						int tuPos = searchTU(token, tu);
+
+						if (tuPos != -1)
+						{
+							tu[tuPos].tokens.emplace_back(std::to_string(locationcounter));
+						}
 					}
 				}
 			}
@@ -388,13 +403,43 @@ void montador2file(std::vector<std::string> &outvec, std::fstream &outputfile)
 {
 	if (load == true)
 	{
+		outputfile << data << std::endl;
 		outputfile << "TABELA USO" << std::endl;
 		preprocessor2file(tu, outputfile);
+		outputfile << std::endl;
 		TD2file(td, outputfile);
 		codetofile(outvec, outputfile);
 	}
 	else
 	{
 		codetofile(outvec, outputfile);
+	}
+}
+
+void valToken(std::string token, int &linecounter)
+{
+	if (token.size() > 99 || !isvalidtype(token))
+	{
+		std::cout << "Erro: Léxico - Token Inválido: " << token << " - Linha: " << linecounter << std::endl;
+		exit(0);
+	}
+}
+
+bool isvalidtype(std::string token)
+{
+	if (iswalpha(token[0]) || token[0] == '_')
+	{
+		for (int i = 1; i < token.size(); i++)
+		{
+			if (!iswalnum(token[i]) && token[0] == '_')
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }

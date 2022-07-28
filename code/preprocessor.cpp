@@ -14,13 +14,12 @@ void readfile(std::fstream& file, std::string ofile)
         str_toupper(line);
         removeComment(line);        
         parseTokens(line, vec, linecounter);
-        //std::cout << line << std::endl;
         
     }
     removeEmptylines(vec);
     resolveEQU(vec);
     resolveIF(vec);
-    printVec(vec);
+    //printVec(vec);
     std::fstream outputfile(ofile, std::ios_base::out);
     preprocessor2file(vec, outputfile);
 }
