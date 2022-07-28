@@ -31,7 +31,6 @@ void parseTokens(std::string &line, std::vector<TokensVector> &vec)
     std::string word;
     std::istringstream iss(line);
     size_t pos;
-    int test;
 
     vec.emplace_back();
 
