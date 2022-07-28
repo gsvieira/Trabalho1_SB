@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <iostream>
 
 struct TokensVector
@@ -18,12 +19,12 @@ struct InstructionsTable
     int size;
 };
 
-struct DefTable
+struct DefinitionTable
 {
     std::string label;
     std::string value;
 
-    DefTable(std::string l)
+    DefinitionTable(std::string l)
     {
         label = l;
         value = "";
@@ -45,4 +46,5 @@ const std::vector<InstructionsTable> ti = {{"ADD", "1", 2},
                                            {"OUTPUT", "13", 2},
                                            {"STOP", "14", 1}};
 
-void readfile(std::fstream &, int &);
+void readfile(std::fstream &, std::vector<TokensVector> &, std::vector<DefinitionTable> &, int &, std::vector<std::string>&);
+void parseTokens(std::string &, std::vector<TokensVector> &);
