@@ -47,7 +47,7 @@ struct DefTable
     }
 };
 
-//Variaveis globais
+// Variaveis globais
 const std::vector<InstructionsTable> ti = {{"ADD", "1", 2},
                                            {"SUB", "2", 2},
                                            {"MUL", "3", 2},
@@ -63,15 +63,16 @@ const std::vector<InstructionsTable> ti = {{"ADD", "1", 2},
                                            {"OUTPUT", "13", 2},
                                            {"STOP", "14", 1}};
 
-
-
-void process(std::fstream&, std::string);
+void process(std::fstream &, std::string);
 void firstpass(std::vector<TokensVector> &, const std::vector<InstructionsTable> &, std::vector<SymbolTable> &, int &, int &);
 void secondpass(std::vector<TokensVector> &, std::vector<std::string> &, const std::vector<InstructionsTable> &, std::vector<SymbolTable> &, int &, int &);
 void printTS(std::vector<SymbolTable> &);
 int searchTS(std::string, std::vector<SymbolTable>);
 void printvec(std::vector<std::string> &outvec);
-void processtofile(std::vector<std::string>&, std::string);
-void verifySections(const std::vector<TokensVector>& vec);
+void codetofile(std::vector<std::string> &, std::fstream &);
+void verifySections(const std::vector<TokensVector> &vec);
 bool isdirective(std::string);
 void copyTStoTD(std::vector<SymbolTable> &);
+void addtoTU(std::string, int &, std::vector<SymbolTable> &);
+int searchTU(std::string, std::vector<TokensVector> &);
+void montador2file(std::vector<std::string> &, std::fstream &);

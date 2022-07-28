@@ -3,6 +3,7 @@
 std::vector<TokensVector> tu;
 std::vector<DefTable> td;
 bool load = false;
+int data = -1;
 void process(std::fstream &file, std::string ofile)
 {
 	std::string line;
@@ -21,24 +22,26 @@ void process(std::fstream &file, std::string ofile)
 	copyTStoTD(ts);
 	linecounter = 1;
 	locationcounter = 0;
-	
-	//printTS(ts);
-	//printVec(vec);
+
+	// printTS(ts);
+	// printVec(vec);
 	verifySections(vec);
 	secondpass(vec, outvec, ti, ts, linecounter, locationcounter);
-	processtofile(outvec, ofile);
+	std::fstream outputfile(ofile, std::ios_base::out);
+	// print to file
+	montador2file(outvec, outputfile);
 }
 
 void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTable> &ti, std::vector<SymbolTable> &ts, int &linecounter, int &locationcounter)
 {
 	if (!vec.back().label.empty()) // se tem rotulo procura na tabela de simbolos
 	{
-		valToken(vec.back().label.substr(0,vec.back().label.find(":")),linecounter);
+		valToken(vec.back().label.substr(0, vec.back().label.find(":")), linecounter);
 		if (!ts.empty()) // se a tabela tem membros faz a busca
 		{
 			for (int i = 0; i < ts.size(); i++)
 			{
-				if (vec.back().label.substr(0,vec.back().label.find(":")) == ts[i].token)
+				if (vec.back().label.substr(0, vec.back().label.find(":")) == ts[i].token)
 				{
 					std::cout << "Erro: Semantico - Símbolo Redefinido: " << vec.back().label << " - Linha: " << linecounter << std::endl;
 					exit(0);
@@ -52,7 +55,6 @@ void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTab
 			{
 				ts.emplace_back(vec.back().label.erase(vec.back().label.find(":")), locationcounter); // acrescenta após não encontrar o valor na tabela
 			}
-			
 		}
 		else // adiciona simbolo na tabela de simbolos
 		{
@@ -83,11 +85,7 @@ void firstpass(std::vector<TokensVector> &vec, const std::vector<InstructionsTab
 	{
 		td.emplace_back(vec.back().tokens[1]);
 	}
-	if (vec.back().tokens[0]== "BEGIN")
-	{
-		load == true;
-	}
-	
+
 	linecounter++;
 }
 
@@ -103,10 +101,11 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 {
 	for (auto &&line : vec)
 	{
-		if (line.tokens.size() == 2 && !isdirective(line.tokens[0])) 
+		if (line.tokens.size() == 2 && !isdirective(line.tokens[0]))
 		{
-			//std::cout << line.tokens[1] << std::endl;
+			// std::cout << line.tokens[1] << std::endl;
 			valToken(line.tokens[1], linecounter);
+			addtoTU(line.tokens[1], linecounter, ts);
 			if (searchTS(line.tokens[1], ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[1] << " - Linha: " << linecounter << std::endl;
@@ -115,13 +114,15 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 		}
 		else if (line.tokens.size() == 3)
 		{
-			valToken(line.tokens[1].substr(0,line.tokens[1].find(",")), linecounter);
-			if (searchTS(line.tokens[1].substr(0,line.tokens[1].find(",")), ts) < 0)
+			valToken(line.tokens[1].substr(0, line.tokens[1].find(",")), linecounter);
+			addtoTU(line.tokens[1].substr(0, line.tokens[1].find(",")), linecounter, ts);
+			if (searchTS(line.tokens[1].substr(0, line.tokens[1].find(",")), ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[1] << " - Linha: " << linecounter << std::endl;
 				exit(0);
 			}
 			valToken(line.tokens[2], linecounter);
+			addtoTU(line.tokens[2], linecounter, ts); // adiciona na tabela de uso
 			if (searchTS(line.tokens[2], ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[2] << " - Linha: " << linecounter << std::endl;
@@ -147,8 +148,8 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 					}
 					if (line.tokens.size() == 3)
 					{
-						outvec.push_back(std::to_string(searchTS(line.tokens[1].substr(0,line.tokens[1].find(",")), ts))); // passando primeiro operando, caso exista, para output vector
-						outvec.push_back(std::to_string(searchTS(line.tokens[2], ts))); // passando segundo operando, caso exista, para output vector
+						outvec.push_back(std::to_string(searchTS(line.tokens[1].substr(0, line.tokens[1].find(",")), ts))); // passando primeiro operando, caso exista, para output vector
+						outvec.push_back(std::to_string(searchTS(line.tokens[2], ts)));										// passando segundo operando, caso exista, para output vector
 					}
 					linecounter++; // incrementar o contador de linhas
 					break;
@@ -195,17 +196,35 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 					exit(0);
 				}
 			}
-			//SECAO
+			// SECAO
 			if (line.tokens[0] == "SECAO")
 			{
 				linecounter++;
 				continue;
 			}
-			
+
 			// BEGIN
+			if (line.tokens[0] == "BEGIN")
+			{
+				load = true;
+				continue;
+			}
+
 			// END
+			if (line.tokens[0] == "END")
+			{
+				continue;
+			}
 			// EXTERN
+			if (line.tokens[0] == "EXTERN")
+			{
+				continue;
+			}
 			// PUBLIC
+			if (line.tokens[0] == "PUBLIC")
+			{
+				continue;
+			}
 		}
 		if (find == false)
 		{
@@ -213,7 +232,6 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 			exit(0);
 		}
 	}
-	
 }
 
 int searchTS(std::string token, std::vector<SymbolTable> ts)
@@ -237,9 +255,8 @@ void printvec(std::vector<std::string> &outvec)
 	std::cout << std::endl;
 }
 
-void processtofile(std::vector<std::string> &outvec, std::string filename)
+void codetofile(std::vector<std::string> &outvec, std::fstream &file)
 {
-	std::fstream file(filename, std::ios_base::out);
 	for (int i = 0; i < outvec.size(); i++)
 	{
 		if (i == 0)
@@ -251,34 +268,30 @@ void processtofile(std::vector<std::string> &outvec, std::string filename)
 	}
 }
 
-void verifySections(const std::vector<TokensVector>& vec)
+void verifySections(const std::vector<TokensVector> &vec)
 {
 	int text = -1;
-	int data = -1;
+	data = -1;
 	for (int i = 0; i < vec.size(); i++)
 	{
 		if (vec[i].tokens[0] != "SECAO")
 		{
-			if (vec[i].tokens[0] != "SPACE" && vec[i].tokens[0] != "CONST")// se não é diretiva que fica na seção de dados
+			if (vec[i].tokens[0] != "SPACE" && vec[i].tokens[0] != "CONST") // se não é diretiva que fica na seção de dados
 			{
-				if (data != -1 && i > data)// intrução está na seção de dados
-				{	
-					std::cout <<" Erro: Semantico - instruções ou diretivas nas seções erradas - Linha: " << i+1 << std::endl;
+				if (data != -1 && i > data) // intrução está na seção de dados
+				{
+					std::cout << " Erro: Semantico - instruções ou diretivas nas seções erradas - Linha: " << i + 1 << std::endl;
 					exit(0);
 				}
-				
 			}
 			else
 			{
-				if (data == -1) //data não foi definido no arquivo
+				if (data == -1) // data não foi definido no arquivo
 				{
-					std::cout << "Erro: Semantico - instruções ou diretivas nas seções erradas - Linha: " << i+1 << std::endl;
+					std::cout << "Erro: Semantico - instruções ou diretivas nas seções erradas - Linha: " << i + 1 << std::endl;
 					exit(0);
 				}
-				
 			}
-			
-			
 		}
 		else if (vec[i].tokens[0] == "SECAO")
 		{
@@ -290,16 +303,12 @@ void verifySections(const std::vector<TokensVector>& vec)
 			{
 				data = i;
 			}
-			
 		}
-		
-		
 	}
 	if (text == -1)
 	{
 		std::cout << "Erro: Semantico - falta de seção de texto" << std::endl;
 	}
-	
 }
 
 bool isdirective(std::string token)
@@ -315,12 +324,77 @@ void copyTStoTD(std::vector<SymbolTable> &ts)
 {
 	for (auto &&linetd : td)
 	{
-		int tdvalue = searchTS(linetd.label,ts);
+		int tdvalue = searchTS(linetd.label, ts);
 		if (tdvalue != -1)
 		{
 			linetd.value = tdvalue;
 		}
-		
 	}
-	
+}
+
+void addtoTU(std::string token, int &locationcounter, std::vector<SymbolTable> &ts)
+{
+	if (load == true)
+	{
+		int pos = searchTS(token, ts);
+		if (pos != -1)
+		{
+			if (ts[pos].externSymbol == true)
+			{
+				for (auto &&linetu : tu)
+				{
+					int tuPos = searchTU(token, tu);
+					if (tuPos != -1)
+					{
+						tu[tuPos].tokens.push_back(std::to_string(locationcounter));
+					}
+				}
+			}
+		}
+	}
+}
+
+int searchTU(std::string token, std::vector<TokensVector> &tu)
+{
+	for (int i = 0; i < tu.size(); i++)
+	{
+		if (tu[i].label == token)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void TD2file(std::vector<DefTable> &vec, std::fstream &file)
+{
+	file << std::endl
+		 << "TABELA DEF" << std::endl;
+	for (int j = 0; j < vec.size(); j++)
+	{
+		if (!vec[j].label.empty())
+		{
+			file << vec[j].label << " ";
+		}
+		if (!vec[j].value.empty())
+		{
+			file << vec[j].value << std::endl;
+		}
+	}
+	file << std::endl;
+}
+
+void montador2file(std::vector<std::string> &outvec, std::fstream &outputfile)
+{
+	if (load == true)
+	{
+		outputfile << "TABELA USO" << std::endl;
+		preprocessor2file(tu, outputfile);
+		TD2file(td, outputfile);
+		codetofile(outvec, outputfile);
+	}
+	else
+	{
+		codetofile(outvec, outputfile);
+	}
 }

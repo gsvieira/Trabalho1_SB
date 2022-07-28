@@ -21,7 +21,8 @@ void readfile(std::fstream& file, std::string ofile)
     resolveEQU(vec);
     resolveIF(vec);
     printVec(vec);
-    preprocessor2file(vec, ofile);
+    std::fstream outputfile(ofile, std::ios_base::out);
+    preprocessor2file(vec, outputfile);
 }
 
 void str_toupper(std::string& s)
@@ -119,35 +120,3 @@ void resolveIF (std::vector<TokensVector>& vec )
     removeEmptylines(vec);
 }
 
-void preprocessor2file(std::vector<TokensVector>& vec, std::string filename)
-{
-    std::fstream file(filename,std::ios_base::out);
-
-    for(int j = 0; j < vec.size(); j++)
-    {
-        if (!vec[j].label.empty())
-        {
-            file << vec[j].label << " ";
-        }
-        if (!vec[j].tokens.empty())
-        {
-            for (int i = 0; i < vec[j].tokens.size(); i++)
-            {
-                if (i==0)
-                {
-                    file << vec[j].tokens[i];
-                }
-                else
-                    file << " " << vec[j].tokens[i]; 
-                
-            }
-            if(j != vec.size()-1)
-            {
-                file << std::endl;
-            }
-        }
-        else
-            file << std::endl;
-        
-    }   
-}

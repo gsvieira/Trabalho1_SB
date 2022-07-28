@@ -68,7 +68,7 @@ void parseTokens(std::string &line, std::vector<TokensVector> &vec, int &linecou
 
     while (iss >> word)
     {
-        //valToken(word, linecounter);
+        // valToken(word, linecounter);
         pos = word.find(':');
         if (pos != std::string::npos)
         {
@@ -115,5 +115,35 @@ bool isvalidtype(std::string token)
     else
     {
         return false;
+    }
+}
+
+void preprocessor2file(std::vector<TokensVector> &vec, std::fstream &file)
+{
+    for (int j = 0; j < vec.size(); j++)
+    {
+        if (!vec[j].label.empty())
+        {
+            file << vec[j].label << " ";
+        }
+        if (!vec[j].tokens.empty())
+        {
+            for (int i = 0; i < vec[j].tokens.size(); i++)
+            {
+                if (i == 0)
+                {
+                    file << vec[j].tokens[i];
+                }
+                else
+                    file << " " << vec[j].tokens[i];
+            }
+            if (j != vec.size() - 1)
+            {
+                file << std::endl;
+                
+            }
+        }
+        else
+            file << std::endl;
     }
 }
