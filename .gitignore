@@ -4,3 +4,4 @@ montador
 processor
 *.pre
 *.obj
+*.o
