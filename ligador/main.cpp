@@ -18,20 +18,34 @@ int main(int argc, char *argv[])
         readfile(file1, usetable1, deftable1, initdados1, code1);
         readfile(file2, usetable2, deftable2, initdados2, code2);
 
-        corretionFactor2 = code2.size();
-        // gentdg(tabelaglobaldef, deftable1, deftable2); //TODO <<---- stoi error
-        // updateTU(usetable2, corretionFactor2);
-        // setupfinalcode(code1, code2, finalcode);
-        // identify(code1, aux, initdados1);
-        // identify(code2, aux2, initdados2);
-        // load(finalcode, usetable1, usetable2, tabelaglobaldef);
+        corretionFactor2 = code1.size();
+        // printTD(deftable1);
+        //  std::cout << "deftable 2"<< std::endl;
+        //  printTD(deftable2);
+
+        gentdg(tabelaglobaldef, deftable1, deftable2);
+        // printTD(tabelaglobaldef);
+
+        printTU(usetable1);
+        std::cout << "-------------" << std::endl;
+        printTU(usetable2);
+        std::cout << "-------------" << std::endl;
+        updateTU(usetable2, corretionFactor2);
+        // std::cout << "-------------" << std::endl;
+        //printTU(usetable2);
+
+        setupfinalcode(code1, code2, finalcode);
+        // auxtofile(aux);
+        identify(code1, aux, initdados1);
+        // auxtofile(aux2);
+        identify(code2, aux2, initdados2);
+        // auxtofile(aux2);
+        load(finalcode, usetable1, usetable2, tabelaglobaldef);
 
         std::string outfilename = std::string(argv[1]);
-        outfilename.erase(outfilename.find("."));
-        std::fstream outfile(outfilename, std::ios_base::out);
-
+        outfilename.erase(outfilename.find_last_of("."));
+        std::ofstream outfile(outfilename, std::ios_base::out);
         codetofile(finalcode, outfile);
-        // identify();
     }
     else
     {
@@ -52,6 +66,9 @@ void readfile(std::fstream &file, std::vector<TokensVector> &usetable, std::vect
 
         if (line == "TABELA USO")
         {
+
+            // std::cout << "TABELA USO"<<std::endl;
+            // std::cout << "continue"<<std::endl;
             continue;
         }
         if (line == "")
@@ -62,9 +79,13 @@ void readfile(std::fstream &file, std::vector<TokensVector> &usetable, std::vect
         // std::cout<< "tabela de uso:" << line << std::endl;
         parseTokens(line, usetable);
     }
+    // std::cout<< "blank:" << line << std::endl;
+    getline(file, line);
+
     while (true)
     {
         getline(file, line);
+        // std::cout<< "tabeladef:" << line << std::endl;
         if (line == "TABELA DEF")
         {
             continue;
@@ -97,16 +118,13 @@ void parseTokens(std::string &line, std::vector<TokensVector> &vec)
     int test;
 
     vec.emplace_back();
-
+    size_t count = 0;
     while (iss >> word)
     {
-        pos = word.find(':');
-        if (pos != std::string::npos)
+        if (count == 0)
         {
-            if (vec.back().label == "")
-            {
-                vec.back().label = word;
-            }
+            vec.back().label = word;
+            count++;
         }
         else
         {
@@ -124,8 +142,7 @@ void extractTD(std::string &line, std::vector<DefinitionTable> &vec)
     if (pos != std::string::npos)
     {
         vec.back().label = line.substr(0, pos);
-        // std::cout << line.substr((pos + 1)) << std::endl;
-        // vec.back().value = std::stoi(line.substr((pos + 1)));
+        vec.back().value = line.substr((pos + 1));
     }
 }
 
@@ -145,6 +162,7 @@ void updateTU(std::vector<TokensVector> &usetable, int corrf)
     {
         for (auto &&addr : line.tokens)
         {
+            // std::cout << addr << std::endl;
             addr = std::to_string(std::stoi(addr) + corrf);
         }
     }
@@ -153,7 +171,7 @@ void setupfinalcode(std::vector<int> &code1, std::vector<int> &code2, std::vecto
 {
     finalcode = code1;
     finalcode.reserve(code1.size() + code2.size());
-    finalcode.insert(std::end(finalcode), std::begin(code2), std::end(code2));
+    finalcode.insert(finalcode.end(), code2.begin(), code2.end());
     aux.assign(code1.size(), true);
     std::fill(aux.begin() + initdados1, aux.end(), false); // TODO: test print
     aux2.assign(code2.size(), true);
@@ -168,8 +186,8 @@ void identify(std::vector<int> &code, std::vector<bool> &aux, int initdados)
         {
             if (code[pos] == std::stoi(lineti.opcode))
             {
-                pos += lineti.size;
                 aux[pos] = false;
+                pos += lineti.size;
                 break;
             }
         }
@@ -180,17 +198,26 @@ void load(std::vector<int> &finalcode, std::vector<TokensVector> &usetable1, std
 {
     relativeaddrs = aux;
     relativeaddrs.insert(relativeaddrs.end(), aux2.begin(), aux2.end());
+    // std::cout << "-------------" << std::endl;
+    // std::cout << corretionFactor2 << std::endl;
+    // std::cout << "-------------" << std::endl;
+    // auxtofile(aux);
+    // auxtofile(aux2);
+    // auxtofile(relativeaddrs);
     executeTU(usetable1, usetable2, tabelaglobaldef, finalcode);
     applycorrf(finalcode);
 }
 
 void executeTU(std::vector<TokensVector> &usetable1, std::vector<TokensVector> &usetable2, std::vector<DefinitionTable> &tabelaglobaldef, std::vector<int> &finalcode)
 {
+    // printTU(usetable2);
+    // std::cout << "-------------" << std::endl;
     for (auto &&lineut : usetable1)
     {
         for (auto &&addr : lineut.tokens)
         {
             finalcode[std::stoi(addr)] = searchTGD(tabelaglobaldef, lineut.label);
+            // std::cout << finalcode[std::stoi(addr)] << std::endl;
             relativeaddrs[std::stoi(addr)] = false;
         }
     }
@@ -199,6 +226,7 @@ void executeTU(std::vector<TokensVector> &usetable1, std::vector<TokensVector> &
         for (auto &&addr : lineut.tokens)
         {
             finalcode[std::stoi(addr)] = searchTGD(tabelaglobaldef, lineut.label);
+            // std::cout << finalcode[std::stoi(addr)] << std::endl;
             relativeaddrs[std::stoi(addr)] = false;
         }
     }
@@ -232,15 +260,72 @@ void applycorrf(std::vector<int> &finalcode)
     }
 }
 
-void codetofile(std::vector<int> &outvec, std::fstream &file)
+void codetofile(std::vector<int> &outvec, std::ofstream &file)
 {
     for (int i = 0; i < outvec.size(); i++)
     {
         if (i == 0)
         {
-            file << outvec[i];
+            std::cout << outvec[i];
+            file << std::to_string(outvec[i]);
         }
         else
-            file << " " << outvec[i];
+        {
+            std::cout << " " << outvec[i];
+            file << " " << std::to_string(outvec[i]);
+        }
     }
+    std::cout << std::endl;
+}
+
+void printTD(std::vector<DefinitionTable> deftable)
+{
+    for (auto &&linedef : deftable)
+    {
+        std::cout << linedef.label << ": " << linedef.value << std::endl;
+    }
+}
+
+void printTU(std::vector<TokensVector> &vec)
+{
+    for (auto line : vec)
+    {
+        if (!line.label.empty())
+        {
+            std::cout << line.label << " ";
+        }
+        if (!line.tokens.empty())
+        {
+            for (int i = 0; i < line.tokens.size(); i++)
+            {
+                if (i == 0)
+                {
+                    std::cout << line.tokens[i];
+                }
+                else
+                    std::cout << " " << line.tokens[i];
+            }
+            std::cout << std::endl;
+        }
+        else
+            std::cout << std::endl;
+    }
+}
+
+void auxtofile(std::vector<bool> &outvec)
+{
+    for (int i = 0; i < outvec.size(); i++)
+    {
+        if (i == 0)
+        {
+            std::cout << outvec[i];
+            //file << std::to_string(outvec[i]);
+        }
+        else
+        {
+            std::cout << " " << outvec[i];
+            //file << " " << std::to_string(outvec[i]);
+        }
+    }
+    std::cout << std::endl;
 }

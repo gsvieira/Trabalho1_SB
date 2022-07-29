@@ -2,6 +2,8 @@
 montador
 !/montador
 processor
+ligador
+!/ligador
 *.pre
 *.obj
 *.o

@@ -72,4 +72,7 @@ void identify(std::vector<int> &, std::vector<bool> &, int);
 void executeTU(std::vector<TokensVector> &, std::vector<TokensVector> &, std::vector<DefinitionTable> &, std::vector<int> &);
 int searchTGD(std::vector<DefinitionTable> &, std::string);
 void applycorrf(std::vector<int> &);
-void codetofile(std::vector<int> &, std::fstream &);
+void codetofile(std::vector<int> &, std::ofstream &);
+void printTD(std::vector<DefinitionTable>);
+void printTU(std::vector<TokensVector> &);
+void auxtofile(std::vector<bool> &);
