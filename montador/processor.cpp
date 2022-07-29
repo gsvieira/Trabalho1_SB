@@ -4,6 +4,7 @@ std::vector<TokensVector> tu;
 std::vector<DefTable> td;
 bool load = false;
 int data = -1;
+int locationdata = -1;
 void process(std::fstream &file, std::string ofile)
 {
 	std::string line;
@@ -105,7 +106,7 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 		if (line.tokens.size() == 2 && !isdirective(line.tokens[0]))
 		{
 			valToken(line.tokens[1], linecounter);
-			addtoTU(line.tokens[1], locationcounter+1, ts);
+			addtoTU(line.tokens[1], locationcounter + 1, ts);
 			if (searchTS(line.tokens[1], ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[1] << " - Linha: " << linecounter << std::endl;
@@ -115,14 +116,14 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 		else if (line.tokens.size() == 3)
 		{
 			valToken(line.tokens[1].substr(0, line.tokens[1].find(",")), linecounter);
-			addtoTU(line.tokens[1].substr(0, line.tokens[1].find(",")), locationcounter+1, ts);
+			addtoTU(line.tokens[1].substr(0, line.tokens[1].find(",")), locationcounter + 1, ts);
 			if (searchTS(line.tokens[1].substr(0, line.tokens[1].find(",")), ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[1] << " - Linha: " << linecounter << std::endl;
 				exit(0);
 			}
 			valToken(line.tokens[2], linecounter);
-			addtoTU(line.tokens[2], locationcounter+2, ts); // adiciona na tabela de uso
+			addtoTU(line.tokens[2], locationcounter + 2, ts); // adiciona na tabela de uso
 			if (searchTS(line.tokens[2], ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[2] << " - Linha: " << linecounter << std::endl;
@@ -170,12 +171,17 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 				{
 					outvec.push_back(line.tokens[1]);
 					linecounter++; // incrementar o contador de linhas
+					locationcounter++;
 					continue;
 				}
 				else
 				{
 					std::cout << "Erro: Sintático - Operando invalido - Linha: " << linecounter << std::endl;
 					exit(0);
+				}
+				if (locationdata == -1)
+				{
+					locationdata = locationcounter;
 				}
 			}
 
@@ -186,12 +192,17 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 				{
 					outvec.push_back("0");
 					linecounter++; // incrementar o contador de linhas
+					locationcounter++;
 					continue;
 				}
 				else
 				{
 					std::cout << "Erro: Sintático - Operando invalido - Linha: " << linecounter << std::endl;
 					exit(0);
+				}
+				if (locationdata == -1)
+				{
+					locationdata = locationcounter;
 				}
 			}
 			// SECAO
@@ -403,7 +414,7 @@ void montador2file(std::vector<std::string> &outvec, std::fstream &outputfile)
 {
 	if (load == true)
 	{
-		outputfile << data << std::endl;
+		outputfile << locationdata << std::endl;
 		outputfile << "TABELA USO" << std::endl;
 		preprocessor2file(tu, outputfile);
 		outputfile << std::endl;
