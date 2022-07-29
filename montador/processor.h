@@ -73,7 +73,7 @@ void codetofile(std::vector<std::string> &, std::fstream &);
 void verifySections(const std::vector<TokensVector> &vec);
 bool isdirective(std::string);
 void copyTStoTD(std::vector<SymbolTable> &);
-void addtoTU(std::string, int &, std::vector<SymbolTable> &);
+void addtoTU(std::string, int, std::vector<SymbolTable> &);
 int searchTU(std::string, std::vector<TokensVector> &);
 void montador2file(std::vector<std::string> &, std::fstream &);
 bool isvalidtype(std::string);

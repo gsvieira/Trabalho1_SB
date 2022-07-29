@@ -105,7 +105,7 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 		if (line.tokens.size() == 2 && !isdirective(line.tokens[0]))
 		{
 			valToken(line.tokens[1], linecounter);
-			addtoTU(line.tokens[1], linecounter, ts);
+			addtoTU(line.tokens[1], locationcounter+1, ts);
 			if (searchTS(line.tokens[1], ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[1] << " - Linha: " << linecounter << std::endl;
@@ -115,14 +115,14 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 		else if (line.tokens.size() == 3)
 		{
 			valToken(line.tokens[1].substr(0, line.tokens[1].find(",")), linecounter);
-			addtoTU(line.tokens[1].substr(0, line.tokens[1].find(",")), linecounter, ts);
+			addtoTU(line.tokens[1].substr(0, line.tokens[1].find(",")), locationcounter+1, ts);
 			if (searchTS(line.tokens[1].substr(0, line.tokens[1].find(",")), ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[1] << " - Linha: " << linecounter << std::endl;
 				exit(0);
 			}
 			valToken(line.tokens[2], linecounter);
-			addtoTU(line.tokens[2], linecounter, ts); // adiciona na tabela de uso
+			addtoTU(line.tokens[2], locationcounter+2, ts); // adiciona na tabela de uso
 			if (searchTS(line.tokens[2], ts) < 0)
 			{
 				std::cout << "Erro: Semantico - Simbolo indefinido: " << line.tokens[2] << " - Linha: " << linecounter << std::endl;
@@ -330,7 +330,7 @@ void copyTStoTD(std::vector<SymbolTable> &ts)
 	}
 }
 
-void addtoTU(std::string token, int &locationcounter, std::vector<SymbolTable> &ts)
+void addtoTU(std::string token, int locationcounter, std::vector<SymbolTable> &ts)
 {
 	if (load == true)
 	{
