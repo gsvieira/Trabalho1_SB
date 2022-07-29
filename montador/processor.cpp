@@ -368,20 +368,17 @@ void addtoTU(std::string token, int locationcounter, std::vector<SymbolTable> &t
 				}
 				else
 				{
-					for (auto &&linetu : tu)
-					{
-						int tuPos = searchTU(token, tu);
+					int tuPos = searchTU(token, tu);
 
-						if (tuPos != -1)
-						{
-							tu[tuPos].tokens.emplace_back(std::to_string(locationcounter));
-						}
-						else
-						{
-							tu.emplace_back();
-							tu.back().label = token;
-							tu.back().tokens.emplace_back(std::to_string(locationcounter));
-						}
+					if (tuPos != -1)
+					{
+						tu[tuPos].tokens.emplace_back(std::to_string(locationcounter));
+					}
+					else if (tuPos == -1)
+					{
+						tu.emplace_back();
+						tu.back().label = token;
+						tu.back().tokens.emplace_back(std::to_string(locationcounter));
 					}
 				}
 			}
