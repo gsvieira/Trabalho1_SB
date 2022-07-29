@@ -19,12 +19,12 @@ int main(int argc, char *argv[])
         readfile(file2, usetable2, deftable2, initdados2, code2);
 
         corretionFactor2 = code2.size();
-        gentdg(tabelaglobaldef, deftable1, deftable2);
-        updateTU(usetable2, corretionFactor2);
-        setupfinalcode(code1, code2, finalcode);
-        identify(code1, aux, initdados1);
-        identify(code2, aux2, initdados2);
-        load(finalcode, usetable1, usetable2, tabelaglobaldef);
+        // gentdg(tabelaglobaldef, deftable1, deftable2); //TODO <<---- stoi error
+        // updateTU(usetable2, corretionFactor2);
+        // setupfinalcode(code1, code2, finalcode);
+        // identify(code1, aux, initdados1);
+        // identify(code2, aux2, initdados2);
+        // load(finalcode, usetable1, usetable2, tabelaglobaldef);
 
         std::string outfilename = std::string(argv[1]);
         outfilename.erase(outfilename.find("."));
