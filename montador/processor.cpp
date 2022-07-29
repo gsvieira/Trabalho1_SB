@@ -171,7 +171,6 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 				{
 					outvec.push_back(line.tokens[1]);
 					linecounter++; // incrementar o contador de linhas
-					locationcounter++;
 					if (locationdata == -1)
 					{
 						locationdata = locationcounter;
@@ -192,7 +191,6 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 				{
 					outvec.push_back("0");
 					linecounter++; // incrementar o contador de linhas
-					locationcounter++;
 					if (locationdata == -1)
 					{
 						locationdata = locationcounter;
