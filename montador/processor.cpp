@@ -169,7 +169,17 @@ void secondpass(std::vector<TokensVector> &vec, std::vector<std::string> &outvec
 			{
 				if (line.tokens.size() == 2)
 				{
-					outvec.push_back(line.tokens[1]);
+					if (line.tokens[1].find("0x") != std::string::npos)
+					{
+						auto hexvalue = line.tokens[1].substr(2);
+						hexvalue = std::to_string(std::stoi(hexvalue,nullptr, 16));
+						outvec.push_back(hexvalue);
+					}
+					else
+					{
+					outvec.push_back(line.tokens[1]);	
+					}
+					
 					linecounter++; // incrementar o contador de linhas
 					if (locationdata == -1)
 					{
