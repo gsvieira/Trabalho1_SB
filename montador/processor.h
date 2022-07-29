@@ -68,6 +68,7 @@ void firstpass(std::vector<TokensVector> &, const std::vector<InstructionsTable>
 void secondpass(std::vector<TokensVector> &, std::vector<std::string> &, const std::vector<InstructionsTable> &, std::vector<SymbolTable> &, int &, int &);
 void printTS(std::vector<SymbolTable> &);
 int searchTS(std::string, std::vector<SymbolTable>);
+int searchTSline(std::string, std::vector<SymbolTable> &);
 void printvec(std::vector<std::string> &outvec);
 void codetofile(std::vector<std::string> &, std::fstream &);
 void verifySections(const std::vector<TokensVector> &vec);

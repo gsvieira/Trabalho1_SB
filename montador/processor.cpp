@@ -25,7 +25,7 @@ void process(std::fstream &file, std::string ofile)
 	locationcounter = 0;
 
 	// printTS(ts);
-	// printVec(vec);
+	//  printVec(vec);
 	verifySections(vec);
 	secondpass(vec, outvec, ti, ts, linecounter, locationcounter);
 
@@ -252,6 +252,17 @@ int searchTS(std::string token, std::vector<SymbolTable> ts)
 	}
 	return -1;
 }
+int searchTSline(std::string token, std::vector<SymbolTable> &ts)
+{
+	for (int i = 0; i < ts.size(); i++)
+	{
+		if (token == ts[i].token)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
 
 void printvec(std::vector<std::string> &outvec)
 {
@@ -343,18 +354,12 @@ void addtoTU(std::string token, int locationcounter, std::vector<SymbolTable> &t
 {
 	if (load == true)
 	{
-		int pos;
-		for (pos = 0; pos < ts.size(); pos++)
-		{
-			if (ts[pos].token == token)
-			{
-				break;
-			}
-		}
-		if (pos != ts.size())
+		int pos = searchTSline(token, ts);
+		if (pos != -1)
 		{
 			if (ts[pos].externSymbol == true)
 			{
+
 				if (tu.empty())
 				{
 					tu.emplace_back();
@@ -370,6 +375,12 @@ void addtoTU(std::string token, int locationcounter, std::vector<SymbolTable> &t
 						if (tuPos != -1)
 						{
 							tu[tuPos].tokens.emplace_back(std::to_string(locationcounter));
+						}
+						else
+						{
+							tu.emplace_back();
+							tu.back().label = token;
+							tu.back().tokens.emplace_back(std::to_string(locationcounter));
 						}
 					}
 				}
