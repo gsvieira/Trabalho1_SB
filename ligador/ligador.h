@@ -29,6 +29,11 @@ struct DefinitionTable
     std::string label;
     std::string value;
 
+    DefinitionTable(std::string l, std::string v)
+    {
+        label = l;
+        value = v;
+    }
     DefinitionTable(std::string l)
     {
         label = l;
@@ -56,10 +61,15 @@ const std::vector<InstructionsTable> ti = {{"ADD", "1", 2},
                                            {"OUTPUT", "13", 2},
                                            {"STOP", "14", 1}};
 
-void readfile(std::fstream &, std::vector<TokensVector> &, std::vector<DefinitionTable> &, int &, std::vector<std::string> &);
+void readfile(std::fstream &, std::vector<TokensVector> &, std::vector<DefinitionTable> &, int &, std::vector<int> &);
 void parseTokens(std::string &, std::vector<TokensVector> &);
 void extractTD(std::string &, std::vector<DefinitionTable> &);
 void gentdg(std::vector<DefinitionTable> &, std::vector<DefinitionTable> &, std::vector<DefinitionTable> &);
 void updateTU(std::vector<TokensVector> &, int);
+void load(std::vector<int> &, std::vector<TokensVector> &, std::vector<TokensVector> &, std::vector<DefinitionTable> &);
 void setupfinalcode(std::vector<int> &, std::vector<int> &, std::vector<int> &);
-void identify(std::vector<int> &code);
+void identify(std::vector<int> &, std::vector<bool> &, int);
+void executeTU(std::vector<TokensVector> &, std::vector<TokensVector> &, std::vector<DefinitionTable> &, std::vector<int> &);
+int searchTGD(std::vector<DefinitionTable> &, std::string);
+void applycorrf(std::vector<int> &);
+void codetofile(std::vector<int> &, std::fstream &);

@@ -21,7 +21,16 @@ int main(int argc, char *argv[])
         corretionFactor2 = code2.size();
         gentdg(tabelaglobaldef, deftable1, deftable2);
         updateTU(usetable2, corretionFactor2);
+        setupfinalcode(code1, code2, finalcode);
+        identify(code1, aux, initdados1);
+        identify(code2, aux2, initdados2);
+        load(finalcode, usetable1, usetable2, tabelaglobaldef);
 
+        std::string outfilename = std::string(argv[1]);
+        outfilename.erase(outfilename.find("."));
+        std::fstream outfile(outfilename, std::ios_base::out);
+
+        codetofile(finalcode, outfile);
         // identify();
     }
     else
@@ -147,23 +156,91 @@ void setupfinalcode(std::vector<int> &code1, std::vector<int> &code2, std::vecto
     finalcode.insert(std::end(finalcode), std::begin(code2), std::end(code2));
     aux.assign(code1.size(), true);
     std::fill(aux.begin() + initdados1, aux.end(), false); // TODO: test print
-    relativeaddrs = aux;
     aux2.assign(code2.size(), true);
     std::fill(aux2.begin() + initdados2, aux2.end(), false); // TODO: test print
-    // relativeaddrs.insert(relativeaddrs.end(), aux2.begin(), aux2.end());
 }
-void identify(std::vector<int> &code)
+void identify(std::vector<int> &code, std::vector<bool> &aux, int initdados)
 {
     int pos = 0;
-    while (true)
+    while (pos < initdados)
     {
-        for (auto &&lineti : ti)
+        for (auto &&lineti : ti) // busca na tabela de intruções
         {
             if (code[pos] == std::stoi(lineti.opcode))
             {
+                pos += lineti.size;
+                aux[pos] = false;
+                break;
             }
         }
+    }
+}
 
-        code[pos]
+void load(std::vector<int> &finalcode, std::vector<TokensVector> &usetable1, std::vector<TokensVector> &usetable2, std::vector<DefinitionTable> &tabelaglobaldef)
+{
+    relativeaddrs = aux;
+    relativeaddrs.insert(relativeaddrs.end(), aux2.begin(), aux2.end());
+    executeTU(usetable1, usetable2, tabelaglobaldef, finalcode);
+    applycorrf(finalcode);
+}
+
+void executeTU(std::vector<TokensVector> &usetable1, std::vector<TokensVector> &usetable2, std::vector<DefinitionTable> &tabelaglobaldef, std::vector<int> &finalcode)
+{
+    for (auto &&lineut : usetable1)
+    {
+        for (auto &&addr : lineut.tokens)
+        {
+            finalcode[std::stoi(addr)] = searchTGD(tabelaglobaldef, lineut.label);
+            relativeaddrs[std::stoi(addr)] = false;
+        }
+    }
+    for (auto &&lineut : usetable2)
+    {
+        for (auto &&addr : lineut.tokens)
+        {
+            finalcode[std::stoi(addr)] = searchTGD(tabelaglobaldef, lineut.label);
+            relativeaddrs[std::stoi(addr)] = false;
+        }
+    }
+}
+
+int searchTGD(std::vector<DefinitionTable> &tabelaglobaldef, std::string token)
+{
+    for (auto &&linetdg : tabelaglobaldef)
+    {
+        if (token == linetdg.label)
+        {
+            return std::stoi(linetdg.value);
+        }
+    }
+    std::cout << "Erro." << std::endl;
+    return -1;
+}
+
+void applycorrf(std::vector<int> &finalcode)
+{
+    for (int i = 0; i < finalcode.size(); i++)
+    {
+        if (relativeaddrs[i] == true)
+        {
+            relativeaddrs[i] = false;
+            if (i >= aux.size())
+            {
+                finalcode[i] += corretionFactor2;
+            }
+        }
+    }
+}
+
+void codetofile(std::vector<int> &outvec, std::fstream &file)
+{
+    for (int i = 0; i < outvec.size(); i++)
+    {
+        if (i == 0)
+        {
+            file << outvec[i];
+        }
+        else
+            file << " " << outvec[i];
     }
 }
