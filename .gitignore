@@ -1,7 +1,6 @@
 /.vscode
 montador
 !/montador
-processor
 ligador
 !/ligador
 *.pre
